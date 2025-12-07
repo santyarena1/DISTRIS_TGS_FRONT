@@ -1,0 +1,199 @@
+﻿body {
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f6fa;
+  color: #333;
+}
+
+header {
+  background-color: #20232a;
+  color: #fff;
+  padding: 16px 24px;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 20px;
+}
+
+main {
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 0 20px 40px;
+}
+
+h2 {
+  margin-top: 0;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 14px;
+}
+
+#login-section,
+#dashboard {
+  background: #fff;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+form label {
+  display: block;
+  margin-top: 10px;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+input[type='email'],
+input[type='password'],
+input[type='text'],
+select {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  margin-bottom: 8px;
+}
+
+button {
+  padding: 8px 14px;
+  border-radius: 4px;
+  border: none;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button:hover {
+  background-color: #005fcc;
+}
+
+.secondary-btn {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.secondary-btn:hover {
+  background-color: #c5c5c5;
+}
+
+.message {
+  margin-top: 10px;
+  color: #c0392b;
+}
+
+.hint {
+  font-size: 12px;
+  color: #666;
+  margin-top: 8px;
+}
+
+.top-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.tabs {
+  margin-bottom: 12px;
+}
+
+.tab-button {
+  margin-right: 8px;
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.tab-button.active {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.tab {
+  display: none;
+  margin-top: 12px;
+}
+
+.tab.active {
+  display: block;
+}
+
+.actions button {
+  margin-right: 8px;
+}
+
+pre {
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: 4px;
+  max-height: 200px;
+  overflow: auto;
+}
+
+.product-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 12px;
+}
+
+.product-list li {
+  padding: 6px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.search-bar {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+/* ====== USUARIOS ====== */
+
+.users-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.user-form-card,
+.user-table-card {
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.user-form-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.users-table th,
+.users-table td {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 6px 8px;
+  text-align: left;
+}
+
+.users-table th {
+  background-color: #f0f0f0;
+  font-weight: 600;
+}
+
+.users-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
