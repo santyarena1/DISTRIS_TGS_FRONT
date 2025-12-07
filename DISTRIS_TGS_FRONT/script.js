@@ -431,8 +431,7 @@ async function loadElitProducts() {
   }
 }
 
-// ================== BUSCADOR GLOBAL ==================
-
+// ================== BUSCADOR GLOBAL (SIEMPRE MUESTRA LOS 4) ==================
 async function loadGlobalSearch() {
   if (!globalList) return;
 
@@ -446,19 +445,15 @@ async function loadGlobalSearch() {
 
   globalList.innerHTML = '<li>Buscando en todos los distribuidores...</li>';
 
-  const limit = 25;
+  const limit = 200;
 
   try {
     const [nbRes, gnRes, tgsRes, elitRes] = await Promise.all([
       authFetch(
-        `${BASE_URL}/newbytes-products?limit=${limit}&q=${encodeURIComponent(
-          q
-        )}`
+        `${BASE_URL}/newbytes-products?limit=${limit}&q=${encodeURIComponent(q)}`
       ),
       authFetch(
-        `${BASE_URL}/gruponucleo-products?limit=${limit}&q=${encodeURIComponent(
-          q
-        )}`
+        `${BASE_URL}/gruponucleo-products?limit=${limit}&q=${encodeURIComponent(q)}`
       ),
       authFetch(
         `${BASE_URL}/tgs-products?limit=${limit}&q=${encodeURIComponent(q)}`
@@ -469,108 +464,108 @@ async function loadGlobalSearch() {
     ]);
 
     const [nbData, gnData, tgsData, elitData] = await Promise.all([
-      nbRes.json().catch(() => []),
-      gnRes.json().catch(() => []),
-      tgsRes.json().catch(() => []),
-      elitRes.json().catch(() => []),
+      nbRes.json().catch(() => ({})),
+      gnRes.json().catch(() => ({})),
+      tgsRes.json().catch(() => ({})),
+      elitRes.json().catch(() => ({})),
     ]);
 
     globalList.innerHTML = '';
 
-    const blocks = [];
+    // Helper para armar una sección por proveedor
+    function buildSection(name, res, data, mapFn, mensajeSinResultados) {
+      const section = {
+        name,
+        items: [],
+        message: '',
+      };
 
-    if (nbRes.ok && Array.isArray(nbData) && nbData.length) {
-      blocks.push({
-        name: 'NewBytes',
-        items: nbData.map((p) => {
-          const desc = p.detalle || '';
-          const marca = p.marca || '';
-          const cat = p.categoria || '';
-          return `${desc} – ${marca} – ${cat}`;
-        }),
-      });
+      if (!res.ok) {
+        section.message =
+          (data && data.error) || `Error al listar productos de ${name}`;
+        return section;
+      }
+
+      if (!Array.isArray(data) || data.length === 0) {
+        section.message = mensajeSinResultados || 'Sin resultados para este proveedor.';
+        return section;
+      }
+
+      section.items = data.map(mapFn);
+      return section;
     }
 
-    if (gnRes.ok && Array.isArray(gnData) && gnData.length) {
-      blocks.push({
-        name: 'Grupo Núcleo',
-        items: gnData.map((p) => {
-          const desc =
-            p.item_desc_0 || p.item_desc_1 || p.item_desc_2 || p.codigo || '';
-          const marca = p.marca || '';
-          const cat = p.categoria || '';
-          return `${desc} – ${marca} – ${cat}`;
-        }),
-      });
-    }
+    const sections = [
+      buildSection('NewBytes', nbRes, nbData, (p) => {
+        const desc = p.detalle || '';
+        const marca = p.marca || '';
+        const cat = p.categoria || '';
+        return `${desc} – ${marca} – ${cat}`;
+      }, 'Sin resultados en NewBytes.'),
+      buildSection('Grupo Núcleo', gnRes, gnData, (p) => {
+        const desc =
+          p.item_desc_0 || p.item_desc_1 || p.item_desc_2 || p.codigo || '';
+        const marca = p.marca || '';
+        const cat = p.categoria || '';
+        return `${desc} – ${marca} – ${cat}`;
+      }, 'Sin resultados en Grupo Núcleo.'),
+      buildSection('TGS', tgsRes, tgsData, (p) => {
+        const nombre = p.name || '(sin nombre)';
+        const cat = p.category || '';
+        const sku = p.internalSku || p.manufacturerSku || '';
+        const price =
+          typeof p.price === 'number'
+            ? new Intl.NumberFormat('es-AR', {
+                style: 'currency',
+                currency: 'ARS',
+              }).format(p.price)
+            : '';
+        return `${nombre} – ${cat} – ${sku}${price ? ' – ' + price : ''}`;
+      }, 'Sin resultados en TGS.'),
+      buildSection('ELIT', elitRes, elitData, (p) => {
+        const nombre = p.nombre || '(sin nombre)';
+        const marca = p.marca || '';
+        const codigo =
+          p.codigoProducto || p.codigoAlfa || p.elitId || '';
+        const price =
+          typeof p.pvpArs === 'number'
+            ? new Intl.NumberFormat('es-AR', {
+                style: 'currency',
+                currency: 'ARS',
+              }).format(p.pvpArs)
+            : '';
+        return `${nombre} – ${marca} – ${codigo}${
+          price ? ' – ' + price : ''
+        }`;
+      }, 'Sin resultados en ELIT.'),
+    ];
 
-    if (tgsRes.ok && Array.isArray(tgsData) && tgsData.length) {
-      blocks.push({
-        name: 'TGS',
-        items: tgsData.map((p) => {
-          const nombre = p.name || '(sin nombre)';
-          const cat = p.category || '';
-          const sku = p.internalSku || p.manufacturerSku || '';
-          const price =
-            typeof p.price === 'number'
-              ? new Intl.NumberFormat('es-AR', {
-                  style: 'currency',
-                  currency: 'ARS',
-                }).format(p.price)
-              : '';
-          return `${nombre} – ${cat} – ${sku}${
-            price ? ' – ' + price : ''
-          }`;
-        }),
-      });
-    }
-
-    if (elitRes.ok && Array.isArray(elitData) && elitData.length) {
-      blocks.push({
-        name: 'ELIT',
-        items: elitData.map((p) => {
-          const nombre = p.nombre || '(sin nombre)';
-          const marca = p.marca || '';
-          const codigo =
-            p.codigoProducto || p.codigoAlfa || p.elitId || '';
-          const price =
-            typeof p.pvpArs === 'number'
-              ? new Intl.NumberFormat('es-AR', {
-                  style: 'currency',
-                  currency: 'ARS',
-                }).format(p.pvpArs)
-              : '';
-          return `${nombre} – ${marca} – ${codigo}${
-            price ? ' – ' + price : ''
-          }`;
-        }),
-      });
-    }
-
-    if (!blocks.length) {
-      globalList.innerHTML =
-        '<li>No se encontraron resultados en ningún distribuidor.</li>';
-      return;
-    }
-
-    blocks.forEach((block) => {
+    sections.forEach((section) => {
       const headerLi = document.createElement('li');
-      headerLi.textContent = `— ${block.name} (${block.items.length}) —`;
+      headerLi.textContent = `— ${section.name} —`;
       headerLi.style.fontWeight = 'bold';
-      headerLi.style.marginTop = '0.5rem';
+      headerLi.style.marginTop = '0.75rem';
       globalList.appendChild(headerLi);
 
-      block.items.forEach((text) => {
+      if (section.items.length) {
+        section.items.forEach((text) => {
+          const li = document.createElement('li');
+          li.textContent = text;
+          globalList.appendChild(li);
+        });
+      } else {
         const li = document.createElement('li');
-        li.textContent = text;
+        li.textContent = section.message || 'Sin resultados.';
+        li.style.fontStyle = 'italic';
         globalList.appendChild(li);
-      });
+      }
     });
   } catch (err) {
     globalList.innerHTML =
       '<li>Error de conexión consultando los distribuidores.</li>';
   }
 }
+
 
 // ================== ABM USUARIOS ==================
 

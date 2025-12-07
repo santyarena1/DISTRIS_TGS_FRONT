@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>TGS · Marketplace Distribuidores</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="assets/css/theme.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/main.css" />
+</head>
+<body class="app-body">
+
+  <!-- LOGIN -->
+  <div id="login-view" class="auth-wrapper">
+    <div class="auth-card">
+      <h1 class="auth-title">Panel TGS Distribuidores</h1>
+      <p class="auth-subtitle">Iniciá sesión para gestionar el marketplace.</p>
+
+      <form id="login-form" class="auth-form">
+        <label class="form-field">
+          <span>Email</span>
+          <input id="login-email" type="email" autocomplete="email" required />
+        </label>
+
+        <label class="form-field">
+          <span>Contraseña</span>
+          <input id="login-password" type="password" autocomplete="current-password" required />
+        </label>
+
+        <button type="submit" class="btn btn-primary btn-full">Ingresar</button>
+        <p id="login-message" class="form-message"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="app-shell" class="app-shell hidden">
+    <header class="app-header">
+      <div class="app-header-left">
+        <div class="brand">
+          <div class="brand-logo">TGS</div>
+          <div class="brand-text">
+            <span class="brand-title">Marketplace Distribuidores</span>
+            <span class="brand-sub">NewBytes · Grupo Núcleo · TGS · ELIT</span>
+          </div>
+        </div>
+      </div>
+      <div class="app-header-right">
+        <div id="user-info" class="user-info"></div>
+        <button id="cart-toggle-btn" class="cart-button" type="button">
+          <span class="cart-icon">🛒</span>
+          <span>Carrito</span>
+          <span id="cart-count" class="cart-badge">0</span>
+        </button>
+        <button id="logout-btn" class="btn btn-ghost" type="button">Cerrar sesión</button>
+      </div>
+    </header>
+
+    <div class="app-main">
+      <!-- Sidebar -->
+      <nav class="sidebar">
+        <button class="nav-item nav-item-active" data-view="view-marketplace">
+          Marketplace
+        </button>
+        <button class="nav-item" data-view="view-sync">
+          Servicios de sincronización
+        </button>
+        <button class="nav-item" data-view="view-newbytes">
+          Productos NewBytes
+        </button>
+        <button class="nav-item" data-view="view-gruponucleo">
+          Productos Grupo Núcleo
+        </button>
+        <button class="nav-item" data-view="view-tgs">
+          Productos TGS
+        </button>
+        <button class="nav-item" data-view="view-elit">
+          Productos ELIT
+        </button>
+        <button class="nav-item" data-view="view-users" id="nav-users">
+          Usuarios
+        </button>
+      </nav>
+
+      <!-- Content -->
+      <main class="content">
+
+        <!-- Marketplace / buscador global -->
+        <section id="view-marketplace" class="view view-active">
+          <header class="view-header">
+            <div>
+              <h2 class="view-title">Marketplace</h2>
+              <p class="view-subtitle">
+                Buscá en todos los distribuidores y armá tu carrito unificado.
+              </p>
+            </div>
+          </header>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="input-group">
+                <input id="global-search-input"
+                       type="text"
+                       placeholder="Ej: Ryzen 5 5600G, SSD 1TB, HyperX Pulsefire..."
+                />
+                <button id="global-search-btn" class="btn btn-primary" type="button">
+                  Buscar
+                </button>
+              </div>
+              <div class="hint-text">
+                Se consulta NewBytes, Grupo Núcleo, TGS y ELIT al mismo tiempo.
+              </div>
+            </div>
+
+            <!-- Barra de filtros y vista -->
+            <div class="filters-bar">
+              <div class="filters-left">
+                <div class="filter-group">
+                  <label for="filter-provider">Distribuidor</label>
+                  <select id="filter-provider">
+                    <option value="all">Todos los distribuidores</option>
+                  </select>
+                </div>
+
+                <div class="filter-group">
+                  <label for="filter-brand">Marca</label>
+                  <select id="filter-brand">
+                    <option value="all">Todas las marcas</option>
+                  </select>
+                </div>
+
+                <div class="filter-group">
+                  <label for="filter-category">Categoría</label>
+                  <select id="filter-category">
+                    <option value="all">Todas las categorías</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="filters-right">
+                <div class="filter-group">
+                  <label for="filter-sort">Ordenar por</label>
+                  <select id="filter-sort">
+                    <option value="relevance">Relevancia</option>
+                    <option value="price_asc">Precio: menor a mayor</option>
+                    <option value="price_desc">Precio: mayor a menor</option>
+                  </select>
+                </div>
+
+                <div class="filter-group">
+                  <label>Vista</label>
+                  <div class="view-toggle">
+                    <button id="view-cards-btn" type="button">Tarjetas</button>
+                    <button id="view-list-btn" type="button">Lista</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="global-results" class="product-grid">
+              <!-- Cards de productos se insertan por JS -->
+            </div>
+
+            <div id="global-results-empty" class="empty-message hidden">
+              Escribí un término de búsqueda para ver resultados.
+            </div>
+          </div>
+        </section>
+
+        <!-- Sync -->
+        <section id="view-sync" class="view">
+          <header class="view-header">
+            <h2 class="view-title">Servicios de sincronización</h2>
+            <p class="view-subtitle">Actualizá los catálogos desde las APIs de cada proveedor.</p>
+          </header>
+
+          <div class="card grid-sync">
+            <button id="btn-sync-nb" class="btn btn-outline">Sincronizar NewBytes</button>
+            <button id="btn-sync-gn" class="btn btn-outline">Sincronizar Grupo Núcleo</button>
+            <button id="btn-sync-tgs" class="btn btn-outline">Sincronizar TGS</button>
+            <button id="btn-sync-elit" class="btn btn-outline">Sincronizar ELIT</button>
+          </div>
+
+          <div class="card">
+            <pre id="sync-output" class="code-block">// Aún no se ejecutó ninguna sincronización.</pre>
+          </div>
+        </section>
+
+        <!-- NewBytes -->
+        <section id="view-newbytes" class="view">
+          <header class="view-header">
+            <h2 class="view-title">Catálogo NewBytes</h2>
+            <p class="view-subtitle">Productos normalizados desde NewBytes.</p>
+          </header>
+
+          <div class="provider-config">
+            <div>
+              Color identificador:
+              <span id="nb-color-pill" class="badge-soft-small"></span>
+            </div>
+            <div>
+              Precio mostrado:
+              <span id="nb-price-strategy"></span>
+            </div>
+            <div>
+              Última sincronización:
+              <span id="nb-last-sync">—</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="input-group">
+                <input id="nb-search-input" type="text" placeholder="Buscar por nombre, marca, categoría o código..." />
+                <button id="nb-search-btn" class="btn btn-primary" type="button">Buscar</button>
+              </div>
+            </div>
+            <div id="nb-results" class="product-grid"></div>
+            <div id="nb-empty" class="empty-message hidden">No hay productos para mostrar.</div>
+          </div>
+        </section>
+
+        <!-- Grupo Núcleo -->
+        <section id="view-gruponucleo" class="view">
+          <header class="view-header">
+            <h2 class="view-title">Catálogo Grupo Núcleo</h2>
+            <p class="view-subtitle">Listado de productos guardados en la base.</p>
+          </header>
+
+          <div class="provider-config">
+            <div>
+              Color identificador:
+              <span id="gn-color-pill" class="badge-soft-small"></span>
+            </div>
+            <div>
+              Precio mostrado:
+              <span id="gn-price-strategy"></span>
+            </div>
+            <div>
+              Última sincronización:
+              <span id="gn-last-sync">—</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="input-group">
+                <input id="gn-search-input" type="text" placeholder="Buscar por descripción, marca o código..." />
+                <button id="gn-search-btn" class="btn btn-primary" type="button">Buscar</button>
+              </div>
+            </div>
+            <div id="gn-results" class="product-grid"></div>
+            <div id="gn-empty" class="empty-message hidden">No hay productos para mostrar.</div>
+          </div>
+        </section>
+
+        <!-- TGS -->
+        <section id="view-tgs" class="view">
+          <header class="view-header">
+            <h2 class="view-title">Catálogo TGS</h2>
+            <p class="view-subtitle">Productos ya cargados en la tienda TGS.</p>
+          </header>
+
+          <div class="provider-config">
+            <div>
+              Color identificador:
+              <span id="tgs-color-pill" class="badge-soft-small"></span>
+            </div>
+            <div>
+              Precio mostrado:
+              <span id="tgs-price-strategy"></span>
+            </div>
+            <div>
+              Última sincronización:
+              <span id="tgs-last-sync">—</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="input-group">
+                <input id="tgs-search-input" type="text" placeholder="Buscar por nombre, categoría o SKU..." />
+                <button id="tgs-search-btn" class="btn btn-primary" type="button">Buscar</button>
+              </div>
+            </div>
+            <div id="tgs-results" class="product-grid"></div>
+            <div id="tgs-empty" class="empty-message hidden">No hay productos para mostrar.</div>
+          </div>
+        </section>
+
+        <!-- ELIT -->
+        <section id="view-elit" class="view">
+          <header class="view-header">
+            <h2 class="view-title">Catálogo ELIT</h2>
+            <p class="view-subtitle">Productos importados desde la API de ELIT.</p>
+          </header>
+
+          <div class="provider-config">
+            <div>
+              Color identificador:
+              <span id="elit-color-pill" class="badge-soft-small"></span>
+            </div>
+            <div>
+              Precio mostrado:
+              <span id="elit-price-strategy"></span>
+            </div>
+            <div>
+              Última sincronización:
+              <span id="elit-last-sync">—</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="input-group">
+                <input id="elit-search-input" type="text" placeholder="Buscar por nombre, marca o código..." />
+                <button id="elit-search-btn" class="btn btn-primary" type="button">Buscar</button>
+              </div>
+            </div>
+            <div id="elit-results" class="product-grid"></div>
+            <div id="elit-empty" class="empty-message hidden">No hay productos para mostrar.</div>
+          </div>
+        </section>
+
+        <!-- Usuarios -->
+        <section id="view-users" class="view">
+          <header class="view-header">
+            <h2 class="view-title">Usuarios</h2>
+            <p class="view-subtitle">Gestión de accesos al panel.</p>
+          </header>
+
+          <div class="grid-2">
+            <div class="card">
+              <h3 class="card-title">Listado de usuarios</h3>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>Nombre</th>
+                    <th>Rol</th>
+                    <th>Creado</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="users-tbody">
+                  <!-- filas por JS -->
+                </tbody>
+              </table>
+              <div id="users-message" class="form-message"></div>
+            </div>
+
+            <div class="card">
+              <h3 id="user-form-title" class="card-title">Crear usuario</h3>
+              <form id="user-form" class="form-vertical">
+                <input id="user-id" type="hidden" />
+
+                <label class="form-field">
+                  <span>Email</span>
+                  <input id="user-email" type="email" required />
+                </label>
+
+                <label class="form-field">
+                  <span>Nombre</span>
+                  <input id="user-name" type="text" />
+                </label>
+
+                <label class="form-field">
+                  <span>Rol</span>
+                  <select id="user-role">
+                    <option value="admin">Admin</option>
+                    <option value="user">User</option>
+                  </select>
+                </label>
+
+                <label class="form-field">
+                  <span>Contraseña</span>
+                  <input id="user-password" type="password" />
+                </label>
+
+                <label class="form-field">
+                  <span>Repetir contraseña</span>
+                  <input id="user-password2" type="password" />
+                </label>
+
+                <div class="form-actions">
+                  <button type="submit" class="btn btn-primary">Guardar</button>
+                  <button id="user-cancel-btn" type="button" class="btn btn-ghost">
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+    <!-- Carrito lateral -->
+    <aside id="cart-panel" class="cart-panel hidden">
+      <div class="cart-panel-header">
+        <h3>Carrito</h3>
+        <button id="cart-close-btn" class="btn-icon" type="button">✕</button>
+      </div>
+      <div id="cart-items" class="cart-items">
+        <!-- items -->
+      </div>
+      <div class="cart-footer">
+        <div class="cart-total-line">
+          <span>Total estimado</span>
+          <span id="cart-total" class="cart-total-value">$0</span>
+        </div>
+        <button class="btn btn-primary btn-full" type="button" id="cart-checkout-btn">
+          Exportar / copiar resumen
+        </button>
+        <p class="hint-text">
+          Por ahora el carrito es local. Más adelante se puede conectar a pedidos reales.
+        </p>
+      </div>
+    </aside>
+
+    <div id="cart-backdrop" class="cart-backdrop hidden"></div>
+  </div>
+
+  <script type="module" src="assets/js/app.js"></script>
+</body>
+</html>
